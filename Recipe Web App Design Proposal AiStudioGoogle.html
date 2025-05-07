@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipe Book</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+
+        /* Header & Nav */
+        header {
+            background: #ff6f61; /* Coral */
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-family: 'Pacifico', cursive; /* A more playful font */
+        }
+        /* Add Pacifico font if you like it */
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+
+        /* Hero Section */
+        .hero {
+            background: url('https://images.unsplash.com/photo-1490818387583-1b217e2 Ssd-0-6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9vZHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60') no-repeat center center/cover;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            padding: 20px 0;
+            background: #fff5e6; /* Light Peach */
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .filter-section .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .filter-group select, .filter-group input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            min-width: 180px;
+        }
+
+        /* Recipe Grid */
+        #recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding-bottom: 30px;
+        }
+
+        .recipe-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .recipe-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .recipe-card-content {
+            padding: 15px;
+        }
+
+        .recipe-card h3 {
+            margin-bottom: 10px;
+            color: #d9534f; /* Darker Coral */
+            font-size: 1.4rem;
+        }
+
+        .recipe-card p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .recipe-card .tags span {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+
+        /* Modal (for Recipe Detail & Add/Edit Form) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Recipe Detail Modal Styling */
+        #recipe-detail-modal img.detail-img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #recipe-detail-modal h2 { color: #d9534f; margin-bottom: 15px; }
+        #recipe-detail-modal h4 { margin-top: 20px; margin-bottom: 10px; color: #555; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        #recipe-detail-modal ul, #recipe-detail-modal ol { margin-left: 20px; margin-bottom: 15px; }
+        #recipe-detail-modal p { margin-bottom: 10px; }
+
+        .rating-stars span {
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #ddd; /* Default star color */
+        }
+        .rating-stars span.selected, .rating-stars span:hover {
+            color: #ffc107; /* Gold for selected/hover */
+        }
+
+        .comments-section textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .comment { border-bottom: 1px dashed #eee; padding-bottom: 10px; margin-bottom: 10px; }
+        .comment p { margin-bottom: 5px; }
+        .comment small { color: #777; }
+
+
+        /* Add/Edit Form Styling */
+        #recipe-form label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        #recipe-form input[type="text"],
+        #recipe-form input[type="number"],
+        #recipe-form input[type="url"],
+        #recipe-form select,
+        #recipe-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        #recipe-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-buttons {
+            margin-top: 25px;
+            text-align: right;
+        }
+        .form-buttons button {
+            padding: 12px 25px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+        .form-buttons button[type="submit"] {
+            background-color: #5cb85c; /* Green */
+            color: white;
+        }
+        .form-buttons button[type="submit"]:hover { background-color: #4cae4c; }
+        .form-buttons button.cancel-btn {
+            background-color: #f0ad4e; /* Orange */
+            color: white;
+        }
+        .form-buttons button.cancel-btn:hover { background-color: #eea236; }
+        
+        #add-recipe-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 25px;
+            background-color: #ff6f61; /* Coral */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #add-recipe-btn:hover {
+            background-color: #e65a50; /* Darker Coral */
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            color: #fff;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>My Recipe Heaven</h1>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Discover Delicious Recipes</h2>
+            <p>Find your next favorite meal right here!</p>
+        </div>
+    </section>
+
+    <div class="filter-section">
+        <div class="container">
+            <div class="filter-group">
+                <label for="cuisine-filter">Cuisine:</label>
+                <select id="cuisine-filter">
+                    <option value="">All Cuisines</option>
+                    {/* Options will be populated by JS */}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="meal-type-filter">Meal Type:</label>
+                <select id="meal-type-filter">
+                    <option value="">All Meal Types</option>
+                    {/* Options will be populated by JS */}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="ingredient-filter">Search by Ingredient:</label>
+                <input type="text" id="ingredient-filter" placeholder="e.g., chicken, tomato">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <button id="add-recipe-btn">✨ Add New Recipe</button>
+        <div id="recipe-grid">
+            <!-- Recipes will be loaded here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Recipe Detail Modal -->
+    <div id="recipe-detail-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('recipe-detail-modal')">×</span>
+            <img src="" alt="Recipe Image" class="detail-img" id="detail-img">
+            <h2 id="detail-name">Recipe Name</h2>
+            <p><strong>Cuisine:</strong> <span id="detail-cuisine"></span></p>
+            <p><strong>Meal Type:</strong> <span id="detail-mealType"></span></p>
+            <p><strong>Prep Time:</strong> <span id="detail-prepTime"></span> | <strong>Cook Time:</strong> <span id="detail-cookTime"></span> | <strong>Servings:</strong> <span id="detail-servings"></span></p>
+            
+            <h4>Ingredients:</h4>
+            <ul id="detail-ingredients"></ul>
+            
+            <h4>Instructions:</h4>
+            <div id="detail-instructions"></div> {/* Using div for potentially multi-line instructions */}
+
+            <h4>Rating:</h4>
+            <div class="rating-stars" id="detail-rating-stars">
+                <!-- Stars will be generated by JS -->
+            </div>
+            <p>Average Rating: <span id="detail-avg-rating">N/A</span> (<span id="detail-rating-count">0</span> votes)</p>
+
+            <h4>Comments:</h4>
+            <div id="detail-comments-list">
+                <!-- Comments will be loaded here -->
+            </div>
+            <textarea id="comment-text" placeholder="Add your comment... 🎉"></textarea>
+            <button onclick="addCommentHandler()">Add Comment</button>
+            <button id="edit-recipe-btn-modal" onclick="openEditFormFromDetail()">Edit Recipe</button>
+        </div>
+    </div>
+
+    <!-- Add/Edit Recipe Modal -->
+    <div id="recipe-form-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('recipe-form-modal')">×</span>
+            <h2 id="form-title">Add New Recipe</h2>
+            <form id="recipe-form">
+                <input type="hidden" id="recipe-id">
+                
+                <label for="name">Recipe Name:</label>
+                <input type="text" id="form-name" required>
+
+                <label for="cuisine">Cuisine:</label>
+                <input type="text" id="form-cuisine" placeholder="e.g., Italian, Mexican" required>
+
+                <label for="mealType">Meal Type:</label>
+                <select id="form-mealType" required>
+                    <option value="Breakfast">Breakfast</option>
+                    <option value="Lunch">Lunch</option>
+                    <option value="Dinner">Dinner</option>
+                    <option value="Supper">Supper</option>
+                    <option value="Snack">Snack</option>
+                    <option value="Dessert">Dessert</option>
+                    <option value="Drink">Drink</option>
+                    <option value="Appetizer">Appetizer</option>
+                </select>
+
+                <label for="prepTime">Preparation Time:</label>
+                <input type="text" id="form-prepTime" placeholder="e.g., 15 mins">
+
+                <label for="cookTime">Cook Time:</label>
+                <input type="text" id="form-cookTime" placeholder="e.g., 30 mins">
+
+                <label for="servings">Servings:</label>
+                <input type="number" id="form-servings" min="1" placeholder="e.g., 4">
+
+                <label for="thumbnailUrl">Thumbnail URL (or local path for concept):</label>
+                <input type="url" id="form-thumbnailUrl" placeholder="https://example.com/image.jpg" required>
+                <!-- For actual local file upload, you'd use <input type="file"> and JavaScript FileReader API -->
+
+                <label for="ingredients">Ingredients (one per line):</label>
+                <textarea id="form-ingredients" placeholder="2 cups flour
+1 tsp baking soda" required></textarea>
+
+                <label for="instructions">Instructions (use new lines for steps):</label>
+                <textarea id="form-instructions" placeholder="1. Mix dry ingredients.
+2. Add wet ingredients." required></textarea>
+                
+                <div class="form-buttons">
+                    <button type="submit" id="save-recipe-btn">Save Recipe</button>
+                    <button type="button" class="cancel-btn" onclick="closeModal('recipe-form-modal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2023 My Recipe Heaven. Cook with joy! 🍲</p>
+    </footer>
+
+    <script>
+        let recipes = [
+            {
+                id: 1,
+                name: "Spaghetti Carbonara",
+                cuisine: "Italian",
+                mealType: "Dinner",
+                prepTime: "10 mins",
+                cookTime: "15 mins",
+                servings: 4,
+                ingredients: ["200g spaghetti", "100g pancetta or guanciale, diced", "2 large eggs", "50g Pecorino Romano cheese, grated", "Freshly ground black pepper", "Salt"],
+                instructions: "1. Cook spaghetti according to package directions. Reserve 1/2 cup pasta water.\n2. While pasta cooks, fry pancetta in a large skillet until crispy. Remove from heat.\n3. In a bowl, whisk eggs, Pecorino cheese, and a generous amount of black pepper.\n4. Drain pasta and add it to the skillet with pancetta. Toss to combine.\n5. Working quickly, pour egg mixture over pasta, stirring rapidly. If too thick, add a little reserved pasta water until creamy. Do not cook the eggs like scrambled eggs.\n6. Serve immediately with more Pecorino and black pepper.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1588013243127-37a42fa02659?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FyYm9uYXJhfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+                ratings: [5, 4, 5],
+                comments: [{ user: "ChefMarco", text: "Classic! Bellissimo! ❤️", timestamp: new Date().toLocaleString() }]
+            },
+            {
+                id: 2,
+                name: "Chicken Tikka Masala",
+                cuisine: "Indian",
+                mealType: "Dinner",
+                prepTime: "20 mins (plus marination)",
+                cookTime: "30 mins",
+                servings: 4,
+                ingredients: ["500g boneless, skinless chicken thighs, cut into pieces", "1 cup plain yogurt", "1 tbsp lemon juice", "2 tsp ground cumin", "2 tsp paprika", "1 tsp ground ginger", "1/2 tsp cayenne pepper (optional)", "1 tbsp oil", "1 large onion, chopped", "3 cloves garlic, minced", "1 tbsp grated fresh ginger", "1 (400g) can crushed tomatoes", "1 cup heavy cream", "1 tsp garam masala", "Salt and pepper to taste", "Fresh cilantro, chopped, for garnish"],
+                instructions: "1. Marinate chicken: In a bowl, combine chicken, yogurt, lemon juice, cumin, paprika, ground ginger, and cayenne. Cover and refrigerate for at least 1 hour (or overnight).\n2. Cook chicken: Heat oil in a large skillet or Dutch oven. Add chicken and cook until browned. Remove chicken and set aside.\n3. Make sauce: Add onion to the skillet and cook until softened. Add garlic and grated ginger, cook for 1 minute. Stir in crushed tomatoes, bring to a simmer, and cook for 10 minutes.\n4. Combine: Stir in heavy cream and garam masala. Return chicken to the pan. Simmer for 10-15 minutes, or until chicken is cooked through and sauce has thickened.\n5. Season with salt and pepper. Garnish with fresh cilantro. Serve with rice or naan bread.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2hpY2tlbiUyMHRpa2thJTIwbWFzYWxhfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+                ratings: [5, 5, 4, 5],
+                comments: []
+            },
+            {
+                id: 3,
+                name: "Classic Pancakes",
+                cuisine: "American",
+                mealType: "Breakfast",
+                prepTime: "10 mins",
+                cookTime: "15 mins",
+                servings: 8, // pancakes
+                ingredients: ["1 1/2 cups all-purpose flour", "3 1/2 tsp baking powder", "1 tsp salt", "1 tbsp white sugar", "1 1/4 cups milk", "1 egg", "3 tbsp butter, melted"],
+                instructions: "1. In a large bowl, sift together the flour, baking powder, salt, and sugar.\n2. Make a well in the center and pour in the milk, egg, and melted butter; mix until smooth.\n3. Heat a lightly oiled griddle or frying pan over medium-high heat.\n4. Pour or scoop the batter onto the griddle, using approximately 1/4 cup for each pancake.\n5. Brown on both sides and serve hot with your favorite toppings (maple syrup, fruit, etc.).",
+                thumbnailUrl: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFuY2FrZXN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                ratings: [4, 4, 3],
+                comments: [{ user: "BreakfastLover", text: "Fluffy and delicious! 🥞", timestamp: new Date().toLocaleString() }]
+            },
+            {
+                id: 4,
+                name: "Guacamole",
+                cuisine: "Mexican",
+                mealType: "Snack",
+                prepTime: "10 mins",
+                cookTime: "0 mins",
+                servings: 4,
+                ingredients: ["3 ripe avocados", "1/2 small onion, finely chopped", "1-2 jalapeños, minced (seeds removed for less heat)", "1/2 cup cilantro, chopped", "2 tbsp lime juice", "1/2 tsp salt", "Optional: 1/2 ripe tomato, diced"],
+                instructions: "1. Mash avocados: Cut avocados in half, remove pits, and scoop flesh into a bowl. Mash with a fork to desired consistency (chunky or smooth).\n2. Add ingredients: Stir in onion, jalapeños, cilantro, lime juice, and salt.\n3. Optional: Gently fold in diced tomato if using.\n4. Taste and adjust seasonings (more lime juice, salt, or jalapeño as needed).\n5. Serve immediately with tortilla chips or as a topping.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1598515211083-0155a8948658?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Z3VhY2Ftb2xlfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+                ratings: [5, 5, 5],
+                comments: []
+            },
+            {
+                id: 5,
+                name: "Caesar Salad",
+                cuisine: "American", // Or Italian-American
+                mealType: "Lunch",
+                prepTime: "20 mins",
+                cookTime: "5 mins (for croutons if homemade)",
+                servings: 2,
+                ingredients: ["1 large head Romaine lettuce, chopped", "1 cup croutons", "1/4 cup grated Parmesan cheese", "For dressing: 1 clove garlic, minced", "1 anchovy fillet, mashed (optional)", "2 tbsp lemon juice", "1 tsp Dijon mustard", "1 tsp Worcestershire sauce", "1 egg yolk (use pasteurized if concerned)", "1/4 cup olive oil", "Salt and pepper to taste"],
+                instructions: "1. Prepare dressing: In a small bowl, whisk together garlic, anchovy (if using), lemon juice, Dijon mustard, Worcestershire sauce, and egg yolk. Slowly whisk in olive oil until emulsified. Season with salt and pepper.\n2. Assemble salad: In a large bowl, combine Romaine lettuce, croutons, and Parmesan cheese.\n3. Dress salad: Pour dressing over salad and toss gently to coat well.\n4. Serve immediately, optionally with more Parmesan on top.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1550304943-4f24f54ddde9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2Flc2FyJTIwc2FsYWR8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                ratings: [4, 5],
+                comments: []
+            },
+            {
+                id: 6,
+                name: "Chocolate Chip Cookies",
+                cuisine: "American",
+                mealType: "Dessert",
+                prepTime: "15 mins",
+                cookTime: "10-12 mins",
+                servings: 24, // cookies
+                ingredients: ["1 cup (2 sticks) unsalted butter, softened", "3/4 cup granulated sugar", "3/4 cup packed brown sugar", "2 large eggs", "1 tsp vanilla extract", "2 1/4 cups all-purpose flour", "1 tsp baking soda", "1/2 tsp salt", "2 cups semisweet chocolate chips"],
+                instructions: "1. Preheat oven to 375°F (190°C). Line baking sheets with parchment paper.\n2. Cream butter and sugars: In a large bowl, beat butter, granulated sugar, and brown sugar until creamy.\n3. Add eggs and vanilla: Beat in eggs one at a time, then stir in vanilla.\n4. Combine dry ingredients: In a separate bowl, whisk together flour, baking soda, and salt.\n5. Mix wet and dry: Gradually add dry ingredients to wet ingredients, mixing until just combined. Stir in chocolate chips.\n6. Bake: Drop rounded tablespoons of dough onto prepared baking sheets. Bake for 10-12 minutes, or until edges are golden brown.\n7. Cool: Let cookies cool on baking sheets for a few minutes before transferring to wire racks to cool completely.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1590080875240-615b3849125e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hvY29sYXRlJTIwY2hpcCUyMGNvb2tpZXN8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                ratings: [5, 5, 5, 4],
+                comments: [{ user: "CookieMonster", text: "Best cookies ever! 🍪🍪🍪", timestamp: new Date().toLocaleString() }]
+            },
+            {
+                id: 7,
+                name: "Beef Tacos",
+                cuisine: "Mexican",
+                mealType: "Dinner",
+                prepTime: "15 mins",
+                cookTime: "15 mins",
+                servings: 4,
+                ingredients: ["1 lb ground beef", "1 small onion, chopped", "1 packet taco seasoning", "2/3 cup water", "12 taco shells or small tortillas", "Toppings: shredded lettuce, diced tomatoes, shredded cheese, salsa, sour cream"],
+                instructions: "1. Cook beef: In a large skillet, cook ground beef and onion over medium heat until beef is browned. Drain off excess fat.\n2. Add seasoning: Stir in taco seasoning and water. Bring to a simmer and cook for 5-7 minutes, or until liquid has reduced and mixture has thickened.\n3. Warm taco shells: Warm taco shells or tortillas according to package directions.\n4. Assemble tacos: Fill taco shells with beef mixture and desired toppings.\n5. Serve immediately.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1565299715199-866c917206bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dGFjb3N8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                ratings: [4, 4, 5],
+                comments: []
+            },
+            {
+                id: 8,
+                name: "Berry Smoothie",
+                cuisine: "Any",
+                mealType: "Breakfast",
+                prepTime: "5 mins",
+                cookTime: "0 mins",
+                servings: 1,
+                ingredients: ["1 cup mixed berries (fresh or frozen)", "1/2 banana", "1/2 cup yogurt (plain or vanilla)", "1/4 cup milk or almond milk", "Optional: 1 tbsp honey or maple syrup, 1 scoop protein powder"],
+                instructions: "1. Combine all ingredients in a blender.\n2. Blend until smooth and creamy. Add more milk if too thick.\n3. Pour into a glass and serve immediately. Enjoy! 🍓🍌",
+                thumbnailUrl: "https://images.unsplash.com/photo-1610879603898-b31365096927?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c21vb3RoaWV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                ratings: [5, 4],
+                comments: []
+            },
+            {
+                id: 9,
+                name: "Classic Omelette",
+                cuisine: "French",
+                mealType: "Breakfast",
+                prepTime: "5 mins",
+                cookTime: "5 mins",
+                servings: 1,
+                ingredients: ["2-3 large eggs", "1 tbsp butter", "Salt and pepper to taste", "Optional fillings: shredded cheese, chopped ham, diced bell peppers, mushrooms, spinach"],
+                instructions: "1. Whisk eggs: In a small bowl, whisk eggs with a pinch of salt and pepper until just blended (do not over-whisk).\n2. Heat pan: Melt butter in a non-stick skillet (8-10 inch) over medium heat until foamy.\n3. Cook eggs: Pour egg mixture into the hot skillet. Let it set for about 30 seconds. Gently push cooked egg from the edges toward the center, tilting the pan so uncooked egg flows underneath.\n4. Add fillings (if using): Once most of the egg is set but still slightly wet on top, sprinkle fillings over one half of the omelette.\n5. Fold and serve: Fold the other half of the omelette over the fillings. Cook for another 30 seconds to 1 minute, until cheese is melted (if using) and omelette is cooked through.\n6. Slide onto a plate and serve immediately.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1598103442939-057c0f9cc779?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8b21lbGV0dGV8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=500&q=60",
+                ratings: [4, 5, 4],
+                comments: []
+            },
+            {
+                id: 10,
+                name: "French Onion Soup",
+                cuisine: "French",
+                mealType: "Supper",
+                prepTime: "15 mins",
+                cookTime: "1 hour 30 mins",
+                servings: 4,
+                ingredients: ["4 large yellow onions, thinly sliced", "3 tbsp butter", "1 tbsp olive oil", "1 tsp sugar", "1/2 tsp salt", "1/4 tsp black pepper", "2 cloves garlic, minced", "8 cups beef broth", "1/2 cup dry white wine (optional)", "1 bay leaf", "4 slices French bread or baguette, toasted", "1 cup Gruyère cheese, shredded"],
+                instructions: "1. Caramelize onions: In a large pot or Dutch oven, melt butter with olive oil over medium-low heat. Add onions, sugar, salt, and pepper. Cook slowly, stirring occasionally, for 30-45 minutes, until deeply caramelized and golden brown.\n2. Add aromatics: Stir in minced garlic and cook for 1 minute more.\n3. Deglaze & simmer: If using wine, pour it in and scrape up any browned bits from the bottom of the pot. Let it simmer for a few minutes. Add beef broth and bay leaf. Bring to a simmer, then reduce heat and cook, partially covered, for at least 30 minutes (longer is better).\n4. Prepare for serving: Preheat broiler. Remove bay leaf from soup. Ladle soup into oven-safe bowls.\n5. Top and broil: Float a slice of toasted bread on top of each bowl. Sprinkle generously with Gruyère cheese.\n6. Place bowls under the broiler for 2-3 minutes, or until cheese is melted, bubbly, and golden brown. Watch carefully to prevent burning.\n7. Serve hot.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1542673743-039297596015?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlbmNoJTIwb25pb24lMjBzb3VwfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+                ratings: [5, 5],
+                comments: []
+            },
+            {
+                id: 11,
+                name: "Caprese Salad",
+                cuisine: "Italian",
+                mealType: "Appetizer",
+                prepTime: "10 mins",
+                cookTime: "0 mins",
+                servings: 2,
+                ingredients: ["2 large ripe tomatoes, sliced 1/4-inch thick", "8 oz fresh mozzarella cheese, sliced 1/4-inch thick", "Fresh basil leaves", "Extra virgin olive oil", "Balsamic glaze (optional)", "Salt and freshly ground black pepper to taste"],
+                instructions: "1. Arrange: On a platter or individual plates, alternate slices of tomato and mozzarella. Tuck fresh basil leaves between the slices or scatter them on top.\n2. Drizzle: Drizzle generously with good quality extra virgin olive oil.\n3. Season: Sprinkle with salt and freshly ground black pepper.\n4. Optional glaze: If desired, drizzle with balsamic glaze.\n5. Serve immediately. This salad is best enjoyed at room temperature.",
+                thumbnailUrl: "https://images.unsplash.com/photo-1572441713132-c542fc4fe282?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FwcmVzZSUyMHNhbGFkfGVufDB8fDB8fHww&auto=format&fit=crop&w=500&q=60",
+                ratings: [5,4,5],
+                comments: [{ user: "FoodieGal", text: "So simple, so fresh! 🍅", timestamp: new Date().toLocaleString() }]
+            }
+        ];
+
+        const recipeGrid = document.getElementById('recipe-grid');
+        const recipeDetailModal = document.getElementById('recipe-detail-modal');
+        const recipeFormModal = document.getElementById('recipe-form-modal');
+        
+        const cuisineFilter = document.getElementById('cuisine-filter');
+        const mealTypeFilter = document.getElementById('meal-type-filter');
+        const ingredientFilter = document.getElementById('ingredient-filter');
+
+        let currentRecipeIdForDetail = null; // To know which recipe's comments/ratings we're dealing with
+        let currentEditRecipeId = null;
+
+
+        function getAverageRating(ratingsArray) {
+            if (!ratingsArray || ratingsArray.length === 0) return 0;
+            const sum = ratingsArray.reduce((acc, rating) => acc + rating, 0);
+            return (sum / ratingsArray.length).toFixed(1);
+        }
+
+        function renderRecipes(filteredRecipes = recipes) {
+            recipeGrid.innerHTML = '';
+            filteredRecipes.forEach(recipe => {
+                const card = document.createElement('div');
+                card.classList.add('recipe-card');
+                card.onclick = () => displayRecipeDetail(recipe.id);
+
+                const avgRating = getAverageRating(recipe.ratings);
+
+                card.innerHTML = `
+                    <img src="${recipe.thumbnailUrl}" alt="${recipe.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image';">
+                    <div class="recipe-card-content">
+                        <h3>${recipe.name}</h3>
+                        <p><strong>Cuisine:</strong> ${recipe.cuisine}</p>
+                        <p><strong>Type:</strong> ${recipe.mealType}</p>
+                        <p><strong>Rating:</strong> ${avgRating} ★ (${recipe.ratings.length} votes)</p>
+                        <div class="tags">
+                           <span>${recipe.cuisine}</span>
+                           <span>${recipe.mealType}</span>
+                        </div>
+                    </div>
+                `;
+                recipeGrid.appendChild(card);
+            });
+        }
+
+        function displayRecipeDetail(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            currentRecipeIdForDetail = id;
+
+            document.getElementById('detail-img').src = recipe.thumbnailUrl;
+            document.getElementById('detail-img').onerror = function() { this.onerror=null; this.src='https://via.placeholder.com/700x300?text=Image+Not+Found'; };
+            document.getElementById('detail-name').textContent = recipe.name;
+            document.getElementById('detail-cuisine').textContent = recipe.cuisine;
+            document.getElementById('detail-mealType').textContent = recipe.mealType;
+            document.getElementById('detail-prepTime').textContent = recipe.prepTime;
+            document.getElementById('detail-cookTime').textContent = recipe.cookTime;
+            document.getElementById('detail-servings').textContent = recipe.servings;
+            
+            const ingredientsList = document.getElementById('detail-ingredients');
+            ingredientsList.innerHTML = recipe.ingredients.map(ing => `<li>${ing}</li>`).join('');
+            
+            const instructionsDiv = document.getElementById('detail-instructions');
+            instructionsDiv.innerHTML = recipe.instructions.split('\n').map(step => `<p>${step}</p>`).join('');
+
+            // Rating
+            const avgRating = getAverageRating(recipe.ratings);
+            document.getElementById('detail-avg-rating').textContent = avgRating > 0 ? avgRating : 'N/A';
+            document.getElementById('detail-rating-count').textContent = recipe.ratings.length;
+            renderRatingStars(recipe.ratings, 'detail-rating-stars', id);
+
+
+            // Comments
+            const commentsList = document.getElementById('detail-comments-list');
+            commentsList.innerHTML = '';
+            if (recipe.comments && recipe.comments.length > 0) {
+                recipe.comments.forEach(comment => {
+                    const commentDiv = document.createElement('div');
+                    commentDiv.classList.add('comment');
+                    commentDiv.innerHTML = `<p>${comment.text}</p><small>By ${comment.user} on ${comment.timestamp}</small>`;
+                    commentsList.appendChild(commentDiv);
+                });
+            } else {
+                commentsList.innerHTML = '<p>No comments yet. Be the first! 😊</p>';
+            }
+            document.getElementById('comment-text').value = ''; // Clear comment textarea
+
+            document.getElementById('edit-recipe-btn-modal').onclick = () => openEditFormFromDetail(id);
+
+
+            recipeDetailModal.style.display = 'block';
+        }
+
+        function renderRatingStars(ratingsArray, containerId, recipeId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const avgRating = Math.round(getAverageRating(ratingsArray)); // Round to nearest whole for star display
+
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.innerHTML = '★';
+                if (i <= avgRating) {
+                    star.classList.add('selected');
+                }
+                star.onclick = () => handleRating(recipeId, i);
+                container.appendChild(star);
+            }
+        }
+
+        function handleRating(recipeId, ratingValue) {
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (recipe) {
+                // In a real app, you'd send this to a backend and check if user already rated
+                recipe.ratings.push(ratingValue);
+                displayRecipeDetail(recipeId); // Re-render detail to show new average
+                renderRecipes(getFilteredRecipes()); // Re-render grid to update card rating
+                alert(`You rated ${recipe.name} ${ratingValue} stars! Thank you! ✨`);
+            }
+        }
+
+        function addCommentHandler() {
+            const commentText = document.getElementById('comment-text').value.trim();
+            if (!commentText || !currentRecipeIdForDetail) return;
+
+            const recipe = recipes.find(r => r.id === currentRecipeIdForDetail);
+            if (recipe) {
+                // In real app, user would be logged in.
+                const newComment = {
+                    user: "GuestUser" + Math.floor(Math.random()*1000), // Simulated user
+                    text: commentText,
+                    timestamp: new Date().toLocaleString()
+                };
+                if (!recipe.comments) recipe.comments = [];
+                recipe.comments.push(newComment);
+                displayRecipeDetail(currentRecipeIdForDetail); // Re-render detail to show new comment
+                alert('Comment added! 🎉');
+            }
+        }
+        
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Populate Filters
+        function populateFilters() {
+            const cuisines = [...new Set(recipes.map(r => r.cuisine))].sort();
+            const mealTypes = [...new Set(recipes.map(r => r.mealType))].sort();
+
+            cuisines.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c;
+                cuisineFilter.appendChild(option);
+            });
+
+            mealTypes.forEach(mt => {
+                const option = document.createElement('option');
+                option.value = mt;
+                option.textContent = mt;
+                mealTypeFilter.appendChild(option);
+            });
+        }
+
+        // Filter Logic
+        function getFilteredRecipes() {
+            const cuisine = cuisineFilter.value;
+            const mealType = mealTypeFilter.value;
+            const ingredientQuery = ingredientFilter.value.toLowerCase().trim();
+
+            return recipes.filter(recipe => {
+                const cuisineMatch = !cuisine || recipe.cuisine === cuisine;
+                const mealTypeMatch = !mealType || recipe.mealType === mealType;
+                const ingredientMatch = !ingredientQuery || recipe.ingredients.some(ing => ing.toLowerCase().includes(ingredientQuery)) || recipe.name.toLowerCase().includes(ingredientQuery);
+                return cuisineMatch && mealTypeMatch && ingredientMatch;
+            });
+        }
+
+        function applyFilters() {
+            renderRecipes(getFilteredRecipes());
+        }
+
+        // Add/Edit Recipe Form Logic
+        const recipeForm = document.getElementById('recipe-form');
+        const formTitle = document.getElementById('form-title');
+        const recipeIdInput = document.getElementById('recipe-id');
+
+        document.getElementById('add-recipe-btn').onclick = () => {
+            currentEditRecipeId = null;
+            formTitle.textContent = "Add New Recipe ✨";
+            recipeForm.reset();
+            recipeIdInput.value = ''; // Clear any hidden ID
+            openModal('recipe-form-modal');
+        };
+        
+        function openEditFormFromDetail(recipeId) {
+            closeModal('recipe-detail-modal'); // Close detail modal first
+            openEditRecipeForm(recipeId);
+        }
+
+
+        function openEditRecipeForm(id) {
+            const recipe = recipes.find(r => r.id === id);
+            if (!recipe) return;
+
+            currentEditRecipeId = id;
+            formTitle.textContent = "Edit Recipe ✎";
+            recipeIdInput.value = recipe.id;
+            document.getElementById('form-name').value = recipe.name;
+            document.getElementById('form-cuisine').value = recipe.cuisine;
+            document.getElementById('form-mealType').value = recipe.mealType;
+            document.getElementById('form-prepTime').value = recipe.prepTime;
+            document.getElementById('form-cookTime').value = recipe.cookTime;
+            document.getElementById('form-servings').value = recipe.servings;
+            document.getElementById('form-thumbnailUrl').value = recipe.thumbnailUrl;
+            document.getElementById('form-ingredients').value = recipe.ingredients.join('\n');
+            document.getElementById('form-instructions').value = recipe.instructions;
+            
+            openModal('recipe-form-modal');
+        }
+
+        recipeForm.onsubmit = function(e) {
+            e.preventDefault();
+            const id = recipeIdInput.value ? parseInt(recipeIdInput.value) : null;
+            
+            const formData = {
+                name: document.getElementById('form-name').value,
+                cuisine: document.getElementById('form-cuisine').value,
+                mealType: document.getElementById('form-mealType').value,
+                prepTime: document.getElementById('form-prepTime').value,
+                cookTime: document.getElementById('form-cookTime').value,
+                servings: parseInt(document.getElementById('form-servings').value),
+                thumbnailUrl: document.getElementById('form-thumbnailUrl').value,
+                ingredients: document.getElementById('form-ingredients').value.split('\n').filter(ing => ing.trim() !== ''),
+                instructions: document.getElementById('form-instructions').value,
+            };
+
+            if (id) { // Editing existing recipe
+                const index = recipes.findIndex(r => r.id === id);
+                if (index !== -1) {
+                    // Preserve ratings and comments
+                    formData.id = id;
+                    formData.ratings = recipes[index].ratings || [];
+                    formData.comments = recipes[index].comments || [];
+                    recipes[index] = formData;
+                }
+            } else { // Adding new recipe
+                formData.id = recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1;
+                formData.ratings = []; // New recipes start with no ratings
+                formData.comments = []; // New recipes start with no comments
+                recipes.push(formData);
+            }
+            
+            closeModal('recipe-form-modal');
+            renderRecipes(getFilteredRecipes());
+            populateFilters(); // In case new cuisine/meal type was added
+            alert(id ? 'Recipe updated successfully! 👍' : 'Recipe added successfully! 🎉');
+        };
+
+
+        // Initial Load
+        window.onload = () => {
+            renderRecipes();
+            populateFilters();
+            cuisineFilter.onchange = applyFilters;
+            mealTypeFilter.onchange = applyFilters;
+            ingredientFilter.onkeyup = (event) => { // Use keyup for more responsive search
+                if (event.key === "Enter" || ingredientFilter.value.length === 0 || ingredientFilter.value.length > 2) {
+                    applyFilters();
+                }
+            };
+        };
+
+        // Close modals if escape key is pressed
+        window.onkeydown = function(event) {
+            if (event.key === "Escape") {
+                closeModal('recipe-detail-modal');
+                closeModal('recipe-form-modal');
+            }
+        }
+        // Close modals if clicked outside content
+        window.onclick = function(event) {
+            if (event.target == recipeDetailModal) {
+                closeModal('recipe-detail-modal');
+            }
+            if (event.target == recipeFormModal) {
+                closeModal('recipe-form-modal');
+            }
+        }
+
+    </script>
+</body>
+</html>
